@@ -5,18 +5,20 @@ var term=process.argv[3];
 var keys=require("./keys.js")
 var spotify = require('node-spotify-api');
 
+
+
 // Check for function call
 if(operation==="concertThis"){
   concertThis(term);
 }
 else if (operation==="spotifyThisSong") {
-
+spotifyThisSong(term);
 }
 else if (operation==="movieThis") {
-
+movieThis(term);
 }
 else if (operation==="doWhatItSays") {
-
+doWhatItSays();
 }
 else if(operation==="?"){
   console.log("\nList of available commands: \nnode liri.js concertThis 'bandName' \nnode liri.js spotifyThisSong 'songName'  \nnode liri.js movieThis 'movieName' \nnode liri.js doWhatItSays ");
@@ -122,8 +124,13 @@ else {
    //
    // * You'll use the `axios` package to retrieve data from the OMDB API. Like all of the in-class activities, the OMDB API requires an API key. You may use `trilogy`.
     function movieThis(term){
-      axios.get("http://www.omdbapi.com/?i=tt3896198&apikey="+keys.OMDB_KEY).then(function(response){
-        console.log(response);
+      console.log("MOVIE THIS: ", term);
+      axios.get("http://www.omdbapi.com/?t="+term+"&apikey="+keys.omdb.key).then(function(response){
+        console.log(response.data);
+        var data=response.data;
+        console.log("\nTitle: "+data.Title+"\nYear: "+data.Year+"\nIMDB Rating: "+data.imdbRating+"\nRotten Tomatos Rating: "
+        +data.Ratings[1].Value+"\nCountry Produced In: "+data.Country+"\nLanguage: "+data.Language+"\nPLOT: "+data.Plot+"\nActors: "+data.Actors);
+
       }).catch(function(error) {
     if (error.response) {
       // The request was made and the server responded with a status code
