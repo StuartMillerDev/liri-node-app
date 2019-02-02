@@ -3,8 +3,8 @@ var axios=require("axios");
 var operation=process.argv[2];
 var term=process.argv[3];
 var keys=require("./keys.js")
-var spotify = require('node-spotify-api');
-
+var Spotify = require("node-spotify-api");
+var spotify = new Spotify(keys.spotify);
 
 
 // Check for function call
@@ -27,9 +27,6 @@ else {
   console.log("\nUnknown Command, Please try a valid command. If you need help type: node liri.js ?");
 }
 
-
-
-  // var spotify = new Spotify(keys.spotify);
 
 
      //* This will search the Bands in Town Artist Events API
@@ -93,11 +90,22 @@ else {
 //
 // * Step Four: On the next screen, scroll down to where you see your client id and client secret. Copy these values down somewhere, you'll need them to use the Spotify API and the [node-spotify-api package](https://www.npmjs.com/package/node-spotify-api).
     function spotifyThisSong(term){
-      spotify.search({ type: 'track', query: term }).then(function(response) {
-          console.log(response);
-        }).catch(function(err) {
-          console.log(err);
-        });
+
+      if(term!=null || term!=""){
+        spotify.search({ type: 'track', query: term }).then(function(response) {
+            console.log(response);
+          }).catch(function(err) {
+            console.log(err);
+          });
+      }
+      else{
+        spotify.search({ type: 'track', query: "The Sign" }).then(function(response) {
+            console.log(response);
+          }).catch(function(err) {
+            console.log(err);
+          });
+      }
+
     }
 
 
