@@ -1,5 +1,33 @@
 require("dotenv").config();
-  var spotify = new Spotify(keys.spotify);
+var axios=require("axios");
+var operation=process.argv[2];
+var term=process.argv[3];
+var keys=require("./keys.js")
+var spotify = require('node-spotify-api');
+
+// Check for function call
+if(operation==="concertThis"){
+  concertThis(term);
+}
+else if (operation==="spotifyThisSong") {
+
+}
+else if (operation==="movieThis") {
+
+}
+else if (operation==="doWhatItSays") {
+
+}
+else if(operation==="?"){
+  console.log("\nList of available commands: \nnode liri.js concertThis 'bandName' \nnode liri.js spotifyThisSong 'songName'  \nnode liri.js movieThis 'movieName' \nnode liri.js doWhatItSays ");
+}
+else {
+  console.log("\nUnknown Command, Please try a valid command. If you need help type: node liri.js ?");
+}
+
+
+
+  // var spotify = new Spotify(keys.spotify);
 
 
      //* This will search the Bands in Town Artist Events API
@@ -12,8 +40,29 @@ require("dotenv").config();
      // * Venue location
      //
      // * Date of the Event (use moment to format this as "MM/DD/YYYY")
-    function concertThis(){
-      
+    function concertThis(artist){
+
+      axios.get("https://rest.bandsintown.com/artists/" + artist + "/events?app_id=codingbootcamp").then(function(response){
+        console.log(response);
+      })  .catch(function(error) {
+    if (error.response) {
+      // The request was made and the server responded with a status code
+      // that falls out of the range of 2xx
+      console.log(error.response.data);
+      console.log(error.response.status);
+      console.log(error.response.headers);
+    } else if (error.request) {
+      // The request was made but no response was received
+      // `error.request` is an object that comes back with details pertaining to the error that occurred.
+      console.log(error.request);
+    } else {
+      // Something happened in setting up the request that triggered an Error
+      console.log("Error", error.message);
+    }
+    console.log(error.config);
+  });
+
+
     }
 
 
@@ -41,8 +90,12 @@ require("dotenv").config();
 // * Step Three: Once logged in, navigate to <https://developer.spotify.com/my-applications/#!/applications/create> to register a new application to be used with the Spotify API. You can fill in whatever you'd like for these fields. When finished, click the "complete" button.
 //
 // * Step Four: On the next screen, scroll down to where you see your client id and client secret. Copy these values down somewhere, you'll need them to use the Spotify API and the [node-spotify-api package](https://www.npmjs.com/package/node-spotify-api).
-    function sportifyThisSong(){
-
+    function spotifyThisSong(term){
+      spotify.search({ type: 'track', query: term }).then(function(response) {
+          console.log(response);
+        }).catch(function(err) {
+          console.log(err);
+        });
     }
 
 
@@ -68,8 +121,26 @@ require("dotenv").config();
    //   * It's on Netflix!
    //
    // * You'll use the `axios` package to retrieve data from the OMDB API. Like all of the in-class activities, the OMDB API requires an API key. You may use `trilogy`.
-    function movieThis(){
-
+    function movieThis(term){
+      axios.get("http://www.omdbapi.com/?i=tt3896198&apikey="+keys.OMDB_KEY).then(function(response){
+        console.log(response);
+      }).catch(function(error) {
+    if (error.response) {
+      // The request was made and the server responded with a status code
+      // that falls out of the range of 2xx
+      console.log(error.response.data);
+      console.log(error.response.status);
+      console.log(error.response.headers);
+    } else if (error.request) {
+      // The request was made but no response was received
+      // `error.request` is an object that comes back with details pertaining to the error that occurred.
+      console.log(error.request);
+    } else {
+      // Something happened in setting up the request that triggered an Error
+      console.log("Error", error.message);
+    }
+    console.log(error.config);
+  });
     }
 
 
