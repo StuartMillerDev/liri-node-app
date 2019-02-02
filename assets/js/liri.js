@@ -5,7 +5,7 @@ var term=process.argv[3];
 var keys=require("./keys.js")
 var Spotify = require("node-spotify-api");
 var spotify = new Spotify(keys.spotify);
-
+var fs=require("fs");
 
 // Check for function call
 if(operation==="concertThis"){
@@ -92,8 +92,20 @@ else {
     function spotifyThisSong(term){
 
       if(term!=null || term!=""){
-        spotify.search({ type: 'track', query: term }).then(function(response) {
-            console.log(response);
+        spotify.search({ type: 'track', query: ''+term}).then(function(response) {
+
+            firstSong=response.tracks.items[0];
+            // console.log("first song:" ,firstSong);
+            var songInfo=[
+              "Artists: "+firstSong.artists.name,
+              "Song Title: "+firstSong.name,
+              "Preview Link: "+firstSong.external_url,
+              "Album: "
+            ].join("\n\n");
+
+            console.log(songInfo);
+            console.log(firstSong);
+
           }).catch(function(err) {
             console.log(err);
           });
@@ -134,7 +146,7 @@ else {
     function movieThis(term){
       console.log("MOVIE THIS: ", term);
       axios.get("http://www.omdbapi.com/?t="+term+"&apikey="+keys.omdb.key).then(function(response){
-        console.log(response.data);
+        // console.log(response.data);
         var data=response.data;
         console.log("\nTitle: "+data.Title+"\nYear: "+data.Year+"\nIMDB Rating: "+data.imdbRating+"\nRotten Tomatos Rating: "
         +data.Ratings[1].Value+"\nCountry Produced In: "+data.Country+"\nLanguage: "+data.Language+"\nPLOT: "+data.Plot+"\nActors: "+data.Actors);
@@ -168,5 +180,13 @@ else {
   //    * Edit the text in random.txt to test out the feature for movie-this and concert-this.
 
     function doWhatItSays(){
+      fs.readFile("../media/random.txt", "utf8", function(err, data){
+          if (err) {
+              return console.log(err);
+              }
+              var command=data;
+              // console.log(command);
+
+          });
 
     }
