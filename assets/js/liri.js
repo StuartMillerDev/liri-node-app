@@ -6,106 +6,82 @@ var keys=require("./keys.js")
 var Spotify = require("node-spotify-api");
 var spotify = new Spotify(keys.spotify);
 var fs=require("fs");
+var moment=require("moment");
 
+// MAIN FUNCTION
+checkCommand(operation,term);
 // Check for function call
-if(operation==="concertThis"){
-  concertThis(term);
-}
-else if (operation==="spotifyThisSong") {
-spotifyThisSong(term);
-}
-else if (operation==="movieThis") {
-movieThis(term);
-}
-else if (operation==="doWhatItSays") {
-doWhatItSays();
-}
-else if(operation==="?"){
-  console.log("\nList of available commands: \nnode liri.js concertThis 'bandName' \nnode liri.js spotifyThisSong 'songName'  \nnode liri.js movieThis 'movieName' \nnode liri.js doWhatItSays ");
-}
-else {
-  console.log("\nUnknown Command, Please try a valid command. If you need help type: node liri.js ?");
+function checkCommand(operation,term){
+  if(operation==="concertThis"){
+    concertThis(term);
+  }
+  else if (operation==="spotifyThisSong") {
+  spotifyThisSong(term);
+  }
+  else if (operation==="movieThis") {
+  movieThis(term);
+  }
+  else if (operation==="doWhatItSays") {
+  doWhatItSays();
+  }
+  else if(operation==="?"){
+    console.log("\nList of available commands: \nnode liri.js concertThis 'bandName' \nnode liri.js spotifyThisSong 'songName'  \nnode liri.js movieThis 'movieName' \nnode liri.js doWhatItSays ");
+  }
+  else {
+    console.log("\nUnknown Command, Please try a valid command. If you need help type: node liri.js ?");
+  }
 }
 
-
-
-     //* This will search the Bands in Town Artist Events API
-     // (`"https://rest.bandsintown.com/artists/" + artist + "/events?app_id=codingbootcamp"`)
-     // for an artist and render the following information about each
-     // event to the terminal:
+     // A FUNCTION TO SEARCH FOR A BAND EVENT AND PRINT THE INFORMATION
      //
      // * Name of the venue
      //
      // * Venue location
      //
-     // * Date of the Event (use moment to format this as "MM/DD/YYYY")
+     // * Date of the Event
     function concertThis(artist){
 
       axios.get("https://rest.bandsintown.com/artists/" + artist + "/events?app_id=codingbootcamp").then(function(response){
-        console.log(response);
+        var data=response.data;
+        var date=data[0].datetime;
+        if (response.data!=null) {
+            console.log("\nVenue Name: "+data[0].venue.name+"\nVenue Location: "+data[0].venue.city+"\nEvent Date: "+moment(date).format('MMMM Do YYYY, h:mm:ss a'));
+        }
+        else {
+          console.log("\nNo Event Data available for this Band, try a different search")
+        }
       })  .catch(function(error) {
-    if (error.response) {
-      // The request was made and the server responded with a status code
-      // that falls out of the range of 2xx
-      console.log(error.response.data);
-      console.log(error.response.status);
-      console.log(error.response.headers);
-    } else if (error.request) {
-      // The request was made but no response was received
-      // `error.request` is an object that comes back with details pertaining to the error that occurred.
-      console.log(error.request);
-    } else {
-      // Something happened in setting up the request that triggered an Error
-      console.log("Error", error.message);
-    }
-    console.log(error.config);
-  });
-
-
+          if (error.response) {
+            // The request was made and the server responded with a status code
+            // that falls out of the range of 2xx
+            console.log(error.response.data);
+            console.log(error.response.status);
+            console.log(error.response.headers);
+          } else if (error.request) {
+            // The request was made but no response was received
+            // `error.request` is an object that comes back with details pertaining to the error that occurred.
+            console.log(error.request);
+          } else {
+            // Something happened in setting up the request that triggered an Error
+            console.log("Error", error.message);
+          }
+          console.log(error.config);
+        });
     }
 
-
-//     // `node liri.js spotify-this-song '<song name here>'`
-//     * This will show the following information about the song in your terminal/bash window
-//
-//   * Artist(s)
-//
-//   * The song's name
-//
-//   * A preview link of the song from Spotify
-//
-//   * The album that the song is from
-//
-// * If no song is provided then your program will default to "The Sign" by Ace of Base.
-//
-// * You will utilize the [node-spotify-api](https://www.npmjs.com/package/node-spotify-api) package in order to retrieve song information from the Spotify API.
-//
-// * The Spotify API requires you sign up as a developer to generate the necessary credentials. You can follow these steps in order to generate a **client id** and **client secret**:
-//
-// * Step One: Visit <https://developer.spotify.com/my-applications/#!/>
-//
-// * Step Two: Either login to your existing Spotify account or create a new one (a free account is fine) and log in.
-//
-// * Step Three: Once logged in, navigate to <https://developer.spotify.com/my-applications/#!/applications/create> to register a new application to be used with the Spotify API. You can fill in whatever you'd like for these fields. When finished, click the "complete" button.
-//
-// * Step Four: On the next screen, scroll down to where you see your client id and client secret. Copy these values down somewhere, you'll need them to use the Spotify API and the [node-spotify-api package](https://www.npmjs.com/package/node-spotify-api).
-    function spotifyThisSong(term){
-
+// Takes the input and performs a search on Spotify API and prints out the results
+     function spotifyThisSong(term){
       if(term!=null || term!=""){
-        spotify.search({ type: 'track', query: ''+term}).then(function(response) {
+        spotify.search({ type: 'track,album', query: ''+term}).then(function(response) {
 
             firstSong=response.tracks.items[0];
-            // console.log("first song:" ,firstSong);
             var songInfo=[
-              "Artists: "+firstSong.artists.name,
+              "Artists: "+firstSong.artists[0].name,
               "Song Title: "+firstSong.name,
-              "Preview Link: "+firstSong.external_url,
-              "Album: "
+              "Preview Link: "+firstSong.preview_url,
+              "Album: "+firstSong.album.name
             ].join("\n\n");
-
             console.log(songInfo);
-            console.log(firstSong);
-
           }).catch(function(err) {
             console.log(err);
           });
@@ -121,11 +97,7 @@ else {
     }
 
 
-   //  `node liri.js movie-this '<movie name here>'`
-   //
-   // * This will output the following information to your terminal/bash window:
-   //
-   //   ```
+   // A FUNCTION THAT SEARCHES OMDB FOR A MOVIE TITLE AND PRINTS THE FOLLOWING:
    //     * Title of the movie.
    //     * Year the movie came out.
    //     * IMDB Rating of the movie.
@@ -134,15 +106,7 @@ else {
    //     * Language of the movie.
    //     * Plot of the movie.
    //     * Actors in the movie.
-   //   ```
-   //
-   // * If the user doesn't type a movie in, the program will output data for the movie 'Mr. Nobody.'
-   //
-   //   * If you haven't watched "Mr. Nobody," then you should: <http://www.imdb.com/title/tt0485947/>
-   //
-   //   * It's on Netflix!
-   //
-   // * You'll use the `axios` package to retrieve data from the OMDB API. Like all of the in-class activities, the OMDB API requires an API key. You may use `trilogy`.
+
     function movieThis(term){
       console.log("MOVIE THIS: ", term);
       axios.get("http://www.omdbapi.com/?t="+term+"&apikey="+keys.omdb.key).then(function(response){
@@ -171,22 +135,14 @@ else {
     }
 
 
-  // `node liri.js do-what-it-says`
-  //
-  //  * Using the `fs` Node package, LIRI will take the text inside of random.txt and then use it to call one of LIRI's commands.
-  //
-  //    * It should run `spotify-this-song` for "I Want it That Way," as follows the text in `random.txt`.
-  //
-  //    * Edit the text in random.txt to test out the feature for movie-this and concert-this.
-
+// A text file that contains the name of a function and a term to search. Performs that operation and term respectfully.
     function doWhatItSays(){
       fs.readFile("../media/random.txt", "utf8", function(err, data){
           if (err) {
               return console.log(err);
               }
-              var command=data;
-              // console.log(command);
-
+              var str=data;
+              var command=data.split(",");
+              checkCommand(command[0],command[1]);
           });
-
     }
